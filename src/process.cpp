@@ -1,5 +1,31 @@
 #include "process.h"
 
+ProcessParam load_process_param(const char *path) {
+    ifstream file;
+	file.open(path);
+	json j = json::parse(file);
+	ProcessParam p;
+    auto block = j["process"];
+    p.max_z_depth = block["max_z_depth"];
+    p.downsample_grid = block["downsample_grid"];
+    p.outlier_meank = block["outlier_meank"];
+    p.dominant_plane_thr = block["dominant_plane_thr"];
+    p.normal_radius = block["normal_radius"];
+    p.descriptor_radius = block["descriptor_radius"];
+
+    block = j["process"]["clustering"];
+    p.clustering_min_perc = block["min_perc"];
+    p.clustering_tollerance = block["tollerance"];
+
+    block = j["process"]["keypoint"];
+    p.keypoint_min_scale = block["min_scale"];
+    p.keypoint_nr_octaves = block["nr_octaves"];
+    p.keypoint_nr_scales_per_octave = block["nr_scales_per_octave"];
+    p.keypoint_min_contrast = block["min_contrast"];
+    p.keypoint_radius = block["radius"];
+    return p;
+}
+
 Processed process(int no, Cloud cloud, ProcessParam param) {
     // depth filtering
     PointCloud<PointXYZRGB>::Ptr cloud_z_filtered(new PointCloud<PointXYZRGB>);

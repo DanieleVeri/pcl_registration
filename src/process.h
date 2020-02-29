@@ -2,6 +2,8 @@
 #define PROCESS_H
 
 #include <iostream>
+#include "json.hpp"
+#include <fstream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
@@ -22,27 +24,26 @@
 
 using namespace pcl;
 using namespace std;
+using json = nlohmann::json;
 
 typedef PointCloud<PointXYZRGB>::Ptr Cloud;
 typedef PointCloud<FPFHSignature33>::Ptr Descriptor;
 
 typedef struct {
-    float max_z_depth = 1.5;
-    float downsample_grid = 0.005;
-    int   outlier_meank = 100;
-    float dominant_plane_thr = 0.02;
-    int   clustering_min_perc = 30;
-    float clustering_tollerance = 0.05;
-    float keypoint_min_scale = 0.002;
-    int   keypoint_nr_octaves = 4;
-    int   keypoint_nr_scales_per_octave = 5;
-    float keypoint_min_contrast = 1;
-    float keypoint_radius = 0.01;
-    float normal_radius = 0.05;
-    float descriptor_radius = 0.1;
+    float max_z_depth;
+    float downsample_grid;
+    int   outlier_meank;
+    float dominant_plane_thr;
+    int   clustering_min_perc;
+    float clustering_tollerance;
+    float keypoint_min_scale;
+    int   keypoint_nr_octaves;
+    int   keypoint_nr_scales_per_octave;
+    float keypoint_min_contrast;
+    float keypoint_radius;
+    float normal_radius;
+    float descriptor_radius;
 } ProcessParam;
-
-const ProcessParam DEFAULT;
 
 typedef struct {
     int no;
@@ -51,8 +52,8 @@ typedef struct {
     Descriptor descriptor;
 } Processed;
 
+ProcessParam load_process_param(const char *path);
 Processed process(int no, Cloud cloud, ProcessParam param);
-
 Processed update(int no, Cloud cloud, ProcessParam param);
 
 #endif

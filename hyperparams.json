@@ -1,0 +1,36 @@
+{
+    "process": {
+        "max_z_depth": 1.5,
+        "downsample_grid": 0.005,
+        "outlier_meank": 100,
+        "dominant_plane_thr": 0.02,
+        "clustering": {
+            "min_perc": 30,
+            "tollerance": 0.05
+        },
+        "keypoint": {
+            "min_scale": 0.002,
+            "nr_octaves": 4,
+            "nr_scales_per_octave": 5,
+            "min_contrast": 1,
+            "radius": 0.01
+        },
+        "normal_radius": 0.05,
+        "descriptor_radius": 0.1
+    },
+
+    "registration": {
+        "init_align": {
+            "min_sample_distance": 0.05,
+            "max_correspondence_distance": 0.15,
+            "iterations": 1000
+        },
+        "icp": {
+            "max_correspondence_distance": 0.15,
+            "outlier_rejection_threshold": 0.05,
+            "transformation_eps": 1e-9,
+            "euclidean_fitness_eps": 1,
+            "max_iterations": 50
+        }
+    }
+}

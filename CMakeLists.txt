@@ -12,6 +12,7 @@ add_definitions(${PCL_DEFINITIONS})
 set(PCL_BUILD_TYPE Release)
  
 file(GLOB PCL_Registration_SRC
+    "src/generate_model.cpp"
     "src/registration.cpp"
     "src/process.cpp"
 )
@@ -21,7 +22,7 @@ file(GLOB PCL_openni_SRC
 )
 
 add_executable(capture ${PCL_openni_SRC})
-add_executable(registration ${PCL_Registration_SRC})
+add_executable(generate_model ${PCL_Registration_SRC})
  
-target_link_libraries (registration ${PCL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries (capture ${PCL_LIBRARIES})
+target_link_libraries (generate_model ${PCL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
