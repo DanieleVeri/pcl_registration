@@ -9,7 +9,7 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
     pass.setFilterLimits(0.0, param.max_z_depth);
     //pass.setFilterLimitsNegative (true);
     pass.filter(*cloud_z_filtered);
-    console::print_info("%d -> z filtered, points: %d \n", no, cloud_z_filtered->points.size());
+    PCL_INFO("%d -> z filtered, points: %d \n", no, cloud_z_filtered->points.size());
 
     // downsample
     VoxelGrid<PointXYZRGB> vox;
@@ -17,7 +17,7 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
     vox.setInputCloud(cloud_z_filtered);
     vox.setLeafSize(param.downsample_grid, param.downsample_grid, param.downsample_grid);
     vox.filter(*cloud_downsampled);
-    console::print_info("%d -> cloud downsampled, points: %d \n", no, cloud_downsampled->points.size());
+    PCL_INFO("%d -> cloud downsampled, points: %d \n", no, cloud_downsampled->points.size());
 
     // outlier removal
     PointCloud<PointXYZRGB>::Ptr cloud_filtered(new PointCloud<PointXYZRGB>);
@@ -26,7 +26,7 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
     sor.setMeanK(param.outlier_meank);
     sor.setStddevMulThresh(1.0);
     sor.filter(*cloud_filtered);
-    console::print_info("%d -> outlier removed, points: %d \n", no, cloud_filtered->points.size());
+    PCL_INFO("%d -> outlier removed, points: %d \n", no, cloud_filtered->points.size());
 
     // find the dominant plane
     float max_iterations = 100;
@@ -47,7 +47,7 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
     extract.setIndices(inliers);
     extract.setNegative(true);
     extract.filter(*cloud_nobg);
-    console::print_info("%d -> dominant plane removed, points: %d \n", no, cloud_nobg->points.size());
+    PCL_INFO("%d -> dominant plane removed, points: %d \n", no, cloud_nobg->points.size());
 
     // clustering
     search::KdTree<PointXYZRGB>::Ptr kd_tree_cluster(new search::KdTree<PointXYZRGB>);
@@ -74,7 +74,7 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
         if (main_cloud_cluster->points.size() < cluster->points.size())
             main_cloud_cluster = cluster;
     }
-    console::print_info("%d -> clustering completed, points: %d \n", no, main_cloud_cluster->points.size());
+    PCL_INFO("%d -> clustering completed, points: %d \n", no, main_cloud_cluster->points.size());
 
     return update(no, main_cloud_cluster, param);
 }
@@ -93,7 +93,7 @@ Processed update(int no, Cloud cloud, ProcessParam param) {
     PointCloud<PointWithScale> keypoints_temp;
     sift_detect.compute(keypoints_temp);
     copyPointCloud(keypoints_temp, *cloud_with_keypoints);
-    console::print_info("%d -> keypoint extracted: %d \n", no, cloud_with_keypoints->points.size());
+    PCL_INFO("%d -> keypoint extracted: %d \n", no, cloud_with_keypoints->points.size());
 
     // normal estimation
     PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
@@ -111,7 +111,7 @@ Processed update(int no, Cloud cloud, ProcessParam param) {
     fpfh_estimation.setInputCloud(cloud_with_keypoints);
     PointCloud<FPFHSignature33>::Ptr main_cluster_descriptors(new PointCloud<FPFHSignature33>);
     fpfh_estimation.compute(*main_cluster_descriptors);
-    console::print_info("%d -> sift descriptor computed \n", no);
+    PCL_INFO("%d -> sift descriptor computed \n", no);
 
     Processed p;
     p.no = no;
