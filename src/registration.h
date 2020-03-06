@@ -16,8 +16,15 @@ using namespace pcl;
 using json = nlohmann::json;
 
 typedef struct {
+	int   init_samples;
+	int   dbscan_min;
+	float dbscan_eps;
+
 	float ia_min_sample_distance;
 	float ia_max_correspondence_distance;
+	float ia_outlier_rejection_threshold;
+	float ia_transformation_eps;
+	float ia_euclidean_fitness_eps;
 	int   ia_iterations;
 
 	float icp_max_correspondence_distance;
@@ -28,7 +35,13 @@ typedef struct {
 } RegistrationParam;
 
 RegistrationParam load_registration_param(const char *path);
-Processed register_pair(Processed src, Processed dst, RegistrationParam param, Eigen::Matrix4f* trans, boost::shared_ptr<visualization::CloudViewer> viewer);
-Processed register_r(vector<Processed> clouds, RegistrationParam param, boost::shared_ptr<visualization::CloudViewer> viewer);
+
+Processed register_pair(Processed src, Processed dst, 
+						ProcessParam process_param, RegistrationParam param, 
+						Eigen::Matrix4f* trans, boost::shared_ptr<visualization::CloudViewer> viewer);
+
+Processed register_r(vector<Processed> clouds, 
+						ProcessParam process_param, RegistrationParam reg_param, 
+						boost::shared_ptr<visualization::CloudViewer> viewer);
 
 #endif

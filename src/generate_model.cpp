@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
 	boost::shared_ptr<visualization::CloudViewer> viewer(new visualization::CloudViewer("3D Viewer"));
     RegistrationParam reg_param = load_registration_param(PARAMS_FILE);
-	auto final = register_r(clouds, reg_param, viewer);
+	auto final = register_r(clouds, process_param, reg_param, viewer);
 	viewer->showCloud(final.cloud);
 
 	while (!viewer->wasStopped())

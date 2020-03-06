@@ -102,10 +102,6 @@ Processed process(int no, Cloud cloud, ProcessParam param) {
     }
     PCL_INFO("%d -> clustering completed, points: %d \n", no, main_cloud_cluster->points.size());
 
-    return update(no, main_cloud_cluster, param);
-}
-
-Processed update(int no, Cloud cloud, ProcessParam param) {
     // keypoint extraction
     PointCloud<PointXYZRGB>::Ptr cloud_with_keypoints(new PointCloud<PointXYZRGB>);
     SIFTKeypoint<PointXYZRGB, PointWithScale> sift_detect;
@@ -113,8 +109,8 @@ Processed update(int no, Cloud cloud, ProcessParam param) {
     sift_detect.setSearchMethod(kd_tree);
     sift_detect.setScales(param.keypoint_min_scale, param.keypoint_nr_octaves, param.keypoint_nr_scales_per_octave);
     sift_detect.setMinimumContrast(param.keypoint_min_contrast);
-    sift_detect.setSearchSurface(cloud);
-    sift_detect.setInputCloud(cloud);
+    sift_detect.setSearchSurface(main_cloud_cluster);
+    sift_detect.setInputCloud(main_cloud_cluster);
     sift_detect.setRadiusSearch(param.keypoint_radius);
     PointCloud<PointWithScale> keypoints_temp;
     sift_detect.compute(keypoints_temp);
@@ -126,13 +122,13 @@ Processed update(int no, Cloud cloud, ProcessParam param) {
     NormalEstimation<PointXYZRGB, Normal> normal_estimation;
     normal_estimation.setSearchMethod(kd_tree);
     normal_estimation.setRadiusSearch(param.normal_radius);
-    normal_estimation.setInputCloud(cloud);
+    normal_estimation.setInputCloud(main_cloud_cluster);
     normal_estimation.compute(*normals);
     // sift descriptor
     FPFHEstimation<PointXYZRGB, Normal, FPFHSignature33> fpfh_estimation;
     fpfh_estimation.setSearchMethod(kd_tree);
     fpfh_estimation.setRadiusSearch(param.descriptor_radius);
-    fpfh_estimation.setSearchSurface(cloud);
+    fpfh_estimation.setSearchSurface(main_cloud_cluster);
     fpfh_estimation.setInputNormals(normals);
     fpfh_estimation.setInputCloud(cloud_with_keypoints);
     PointCloud<FPFHSignature33>::Ptr main_cluster_descriptors(new PointCloud<FPFHSignature33>);
@@ -141,7 +137,57 @@ Processed update(int no, Cloud cloud, ProcessParam param) {
 
     Processed p;
     p.no = no;
-    p.cloud = cloud;
+    p.cloud = main_cloud_cluster;
+    p.keypoints = cloud_with_keypoints;
+    p.descriptor = main_cluster_descriptors;
+    return p;
+}
+
+Processed post_process(int no, Cloud cloud, ProcessParam param) {
+    // downsample
+    VoxelGrid<PointXYZRGB> vox;
+    PointCloud<PointXYZRGB>::Ptr cloud_downsampled(new PointCloud<PointXYZRGB>);
+    vox.setInputCloud(cloud);
+    vox.setLeafSize(param.downsample_grid, param.downsample_grid, param.downsample_grid);
+    vox.filter(*cloud_downsampled);
+    PCL_INFO("%d -> cloud downsampled, points: %d \n", no, cloud_downsampled->points.size());
+
+    // keypoint extraction
+    PointCloud<PointXYZRGB>::Ptr cloud_with_keypoints(new PointCloud<PointXYZRGB>);
+    SIFTKeypoint<PointXYZRGB, PointWithScale> sift_detect;
+    search::KdTree<PointXYZRGB>::Ptr kd_tree(new search::KdTree<PointXYZRGB>());
+    sift_detect.setSearchMethod(kd_tree);
+    sift_detect.setScales(param.keypoint_min_scale, param.keypoint_nr_octaves, param.keypoint_nr_scales_per_octave);
+    sift_detect.setMinimumContrast(param.keypoint_min_contrast);
+    sift_detect.setSearchSurface(cloud_downsampled);
+    sift_detect.setInputCloud(cloud_downsampled);
+    sift_detect.setRadiusSearch(param.keypoint_radius);
+    PointCloud<PointWithScale> keypoints_temp;
+    sift_detect.compute(keypoints_temp);
+    copyPointCloud(keypoints_temp, *cloud_with_keypoints);
+    PCL_INFO("%d -> keypoint extracted: %d \n", no, cloud_with_keypoints->points.size());
+
+    // normal estimation
+    PointCloud<Normal>::Ptr normals(new PointCloud<Normal>);
+    NormalEstimation<PointXYZRGB, Normal> normal_estimation;
+    normal_estimation.setSearchMethod(kd_tree);
+    normal_estimation.setRadiusSearch(param.normal_radius);
+    normal_estimation.setInputCloud(cloud_downsampled);
+    normal_estimation.compute(*normals);
+    // sift descriptor
+    FPFHEstimation<PointXYZRGB, Normal, FPFHSignature33> fpfh_estimation;
+    fpfh_estimation.setSearchMethod(kd_tree);
+    fpfh_estimation.setRadiusSearch(param.descriptor_radius);
+    fpfh_estimation.setSearchSurface(cloud_downsampled);
+    fpfh_estimation.setInputNormals(normals);
+    fpfh_estimation.setInputCloud(cloud_with_keypoints);
+    PointCloud<FPFHSignature33>::Ptr main_cluster_descriptors(new PointCloud<FPFHSignature33>);
+    fpfh_estimation.compute(*main_cluster_descriptors);
+    PCL_INFO("%d -> sift descriptor computed \n", no);
+
+    Processed p;
+    p.no = no;
+    p.cloud = cloud_downsampled;
     p.keypoints = cloud_with_keypoints;
     p.descriptor = main_cluster_descriptors;
     return p;

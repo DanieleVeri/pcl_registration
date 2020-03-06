@@ -13,24 +13,32 @@
             "nr_octaves": 4,
             "nr_scales_per_octave": 5,
             "min_contrast": 1,
-            "radius": 0.01
+            "radius": 0.05
         },
         "normal_radius": 0.05,
-        "descriptor_radius": 0.1
+        "descriptor_radius": 0.05
     },
 
     "registration": {
+        "init_samples": 20,
+        "dbscan": {
+            "min": 2,
+            "eps": 0.25
+        },
         "init_align": {
-            "min_sample_distance": 0.05,
-            "max_correspondence_distance": 0.15,
+            "min_sample_distance": 0.01,
+            "max_correspondence_distance": 0.05,
+            "outlier_rejection_threshold": 0.05,
+            "euclidean_fitness_eps": 1e-3,
+            "transformation_eps": 1e-6,
             "iterations": 1000
         },
         "icp": {
-            "max_correspondence_distance": 0.15,
+            "max_correspondence_distance": 0.05,
             "outlier_rejection_threshold": 0.05,
-            "transformation_eps": 1e-9,
-            "euclidean_fitness_eps": 1,
-            "max_iterations": 50
+            "transformation_eps": 1e-6,
+            "euclidean_fitness_eps": 1e-3,
+            "max_iterations": 500
         }
     }
 }
