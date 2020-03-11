@@ -36,12 +36,20 @@ typedef struct {
 
 RegistrationParam load_registration_param(const char *path);
 
-Processed register_pair(Processed src, Processed dst, 
+Eigen::Matrix4f register_pair(Processed src, Processed dst, 
 						ProcessParam process_param, RegistrationParam param, 
-						Eigen::Matrix4f* trans, boost::shared_ptr<visualization::CloudViewer> viewer);
+						boost::shared_ptr<visualization::CloudViewer> viewer);
 
-Processed register_r(vector<Processed> clouds, 
+Cloud register_r(vector<Processed> clouds, 
 						ProcessParam process_param, RegistrationParam reg_param, 
 						boost::shared_ptr<visualization::CloudViewer> viewer);
+
+// Matrix utils
+
+Eigen::Matrix4f vec2matrix(vector<float> v);
+
+vector<float> matrix2vec(Eigen::Matrix4f m);
+
+void print_matrix(Eigen::Matrix4f m);
 
 #endif

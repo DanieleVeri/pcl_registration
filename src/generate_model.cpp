@@ -1,7 +1,10 @@
 #include "process.h"
 #include "registration.h"
+#include "mesh.h"
 
 #define PARAMS_FILE "../hyperparams.json"
+#define PCD_FILE "OUTPUT.pcd"
+#define VTK_FILE "OUTPUT.vtk"
 
 int main(int argc, char **argv)
 {
@@ -48,26 +51,24 @@ int main(int argc, char **argv)
 	sort(clouds.begin(), clouds.end(), 
 		[](const Processed & a, const Processed & b) -> bool {return a.no < b.no;});
 
+    // registration
 	boost::shared_ptr<visualization::CloudViewer> viewer(new visualization::CloudViewer("3D Viewer"));
     RegistrationParam reg_param = load_registration_param(PARAMS_FILE);
 	auto final = register_r(clouds, process_param, reg_param, viewer);
-	viewer->showCloud(final.cloud);
+	viewer->showCloud(final);
+
+	// smooth cloud
+	MeshParam mesh_param = load_mesh_param(PARAMS_FILE);
+	auto smoothed = smooth_cloud(final, mesh_param);
+	io::savePCDFileASCII (PCD_FILE, *smoothed);
+
+	// mesh generation
+	save_vtk(smoothed, VTK_FILE, mesh_param);
+	PCL_INFO("mesh generated: %s\n", VTK_FILE);
 
 	while (!viewer->wasStopped())
         sleep(1);
         
 	return EXIT_SUCCESS;
 }
-
-/* smooth
-search::KdTree<PointXYZRGB>::Ptr tree (new search::KdTree<PointXYZRGB>);
-PointCloud<PointNormal> mls_points;
-MovingLeastSquares<PointXYZRGB, PointNormal> mls;
-mls.setComputeNormals (true);
-mls.setInputCloud(c);
-mls.setPolynomialOrder(2);
-mls.setSearchMethod (tree);
-mls.setSearchRadius (0.1);
-mls.process (mls_points);
-copyPointCloud(mls_points, *c);
-*/
+ 

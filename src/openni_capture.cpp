@@ -22,7 +22,7 @@ void grabberCallback(const PointCloud<PointXYZRGBA>::ConstPtr &cloud)
 	if (saveCloud)
 	{
 		stringstream stream;
-		stream <<file_folder << "inputCloud" << filesSaved << ".pcd";
+		stream <<file_folder << (filesSaved < 10 ? "inputCloud0" : "inputCloud") << filesSaved << ".pcd";
 		string filename = stream.str();
 		if (io::savePCDFile(filename, *cloud, true) == 0)
 		{

@@ -54,6 +54,6 @@ typedef struct {
 
 ProcessParam load_process_param(const char *path);
 Processed process(int no, Cloud cloud, ProcessParam param);
-Processed post_process(int no, Cloud cloud, ProcessParam param);
+Cloud extract_main_cluster(Cloud in, ProcessParam param);
 
 #endif

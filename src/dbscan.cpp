@@ -112,21 +112,24 @@ vector<float> main_centroid(vector<Point> &points) {
 	}
     free(clusters_size);
 
+    if(clusters.size() == 0) 
+        return vector<float>();
+
 	sort(clusters.begin(), clusters.end(), 
 		[](const Cluster & a, const Cluster & b) -> bool {return a.size > b.size;});
 	cout<<endl<<"cluster size:"<<clusters[0].size<<"    id: "<<clusters[0].id<<endl;
     
+    vector<float> centroid = vector<float>(DIMENSIONS, 0);
     int main_cluster_id = clusters[0].id;
     int main_cluster_size = clusters[0].size;
-    vector<float> acc = vector<float>(DIMENSIONS, 0);
     for(int i=0; i<points.size(); i++) {
         if(points[i].clusterID != main_cluster_id)
             continue;
         for(int j=0; j<DIMENSIONS; j++) 
-            acc[j] += points[i].x[j];
+            centroid[j] += points[i].x[j];
     }
     for(int j=0; j<DIMENSIONS; j++) 
-        acc[j] /= main_cluster_size;
+        centroid[j] /= main_cluster_size;
     
-    return acc;
+    return centroid;
 }

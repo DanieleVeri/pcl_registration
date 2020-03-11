@@ -14,6 +14,7 @@ set(PCL_BUILD_TYPE Release)
 file(GLOB PCL_Registration_SRC
     "src/generate_model.cpp"
     "src/registration.cpp"
+    "src/mesh.cpp"
     "src/dbscan.cpp"
     "src/process.cpp"
 )

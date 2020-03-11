@@ -1,6 +1,6 @@
 {
     "process": {
-        "max_z_depth": 1.5,
+        "max_z_depth": 1.8,
         "downsample_grid": 0.005,
         "outlier_meank": 100,
         "dominant_plane_thr": 0.02,
@@ -23,10 +23,10 @@
         "init_samples": 20,
         "dbscan": {
             "min": 2,
-            "eps": 0.25
+            "eps": 0.2
         },
         "init_align": {
-            "min_sample_distance": 0.01,
+            "min_sample_distance": 0.025,
             "max_correspondence_distance": 0.05,
             "outlier_rejection_threshold": 0.05,
             "euclidean_fitness_eps": 1e-3,
@@ -38,7 +38,20 @@
             "outlier_rejection_threshold": 0.05,
             "transformation_eps": 1e-6,
             "euclidean_fitness_eps": 1e-3,
-            "max_iterations": 500
+            "max_iterations": 1000
+        }
+    },
+
+    "mesh": {
+        "mls": {
+            "radius": 0.03,
+            "order": 1
+        },
+        "normal_radius": 40,
+        "gp3": {
+            "radius": 0.25,
+            "mu": 2.5,
+            "max_nn": 200
         }
     }
 }
