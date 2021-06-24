@@ -1,5 +1,6 @@
 # 3D regitration of point clouds grabbed via Kinect
 ![](img.jpg)
+3D printed suitcase
 ## Dependencies
  - pcl 1.7
 
