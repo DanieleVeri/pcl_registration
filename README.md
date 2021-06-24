@@ -1,5 +1,5 @@
 # 3D regitration of point clouds grabbed via Kinect
-
+![](img.jpg)
 ## Dependencies
  - pcl 1.7
 
@@ -36,4 +36,4 @@ Parameter tuning: `hyperparameter.json`
 
 ## TODO
  - multithread registration
- - backtrack along global alignement
+ - backtrack axlong global alignement
